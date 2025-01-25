@@ -1,12 +1,23 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 )
 
+type Response struct {
+	Message string `json:"message"`
+	Status  int    `json:"status"`
+}
+
 func helloHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Hello World!")
+	w.Header().Set("Content-Type", "application/json")
+	response := Response{
+		Message: "Hello World!",
+		Status:  200,
+	}
+	json.NewEncoder(w).Encode(response)
 }
 
 func main() {
