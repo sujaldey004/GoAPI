@@ -2,26 +2,19 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
-type Response struct {
-	Message string `json:"message"`
-	Status  int    `json:"status"`
-}
-
-func helloHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	response := Response{
-		Message: "Hello World!",
-		Status:  200,
-	}
-	json.NewEncoder(w).Encode(response)
-}
-
 func main() {
-	http.HandleFunc("/hello", helloHandler)
-	fmt.Println("Server running on http://localhost:8080/hello")
-	http.ListenAndServe(":8080", nil)
+	router := mux.NewRouter()
+	router.HandleFunc("/hello/{name}", func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		name := vars["name"]
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]string{"message": "Hello " + name})
+	}).Methods("GET")
+	http.ListenAndServe(":8080", router)
 }
